@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -14,6 +18,8 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView back;
     private Button cont1;
     private String Name,Email,Password,Confpassword,Mobile;
+
+    DatabaseReference databaseReference;
 
 
     @Override
@@ -29,11 +35,16 @@ public class SignUpActivity extends AppCompatActivity {
         mobile = (EditText) findViewById(R.id.mobile);
         back = (TextView) findViewById(R.id.terms);
 
+        databaseReference= FirebaseDatabase.getInstance().getReference().child("Users");
+
         cont1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isValidate()){
                     startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
+                    databaseReference= FirebaseDatabase.getInstance().getReference().child("Usersdetail");
+                    Adddata();
+
                 }
 
             }
@@ -63,6 +74,7 @@ public class SignUpActivity extends AppCompatActivity {
     private boolean isValidate(){
 
         boolean isValidate=true;
+        databaseReference.setValue(isValidate);
 
         Name=name.getText().toString().trim();
         Email=email.getText().toString().trim();
@@ -91,8 +103,27 @@ public class SignUpActivity extends AppCompatActivity {
         }if (Mobile.length()==0) {
             mobile.setError("Phone no contain 10 chatacters");
             isValidate = false;
+        }if (Email.equals("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+")) {
+            email.setError("Email adress is incorrect");
+            isValidate = false;
         }
 
+
+
         return isValidate;
+    }
+    public void Adddata(){
+
+        String Name=name.getText().toString().trim();
+        String Email=email.getText().toString().trim();
+        String Password=password.getText().toString().trim();
+        String Mobile=mobile.getText().toString().trim();
+
+
+        SaveData saveData=new SaveData(Name,Email,Password,Mobile);
+        databaseReference.push().setValue(saveData);
+
+        Toast.makeText( SignUpActivity.this,"Successfully Saved Your Data !",Toast.LENGTH_LONG).show();
+
     }
 }
