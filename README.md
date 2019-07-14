@@ -1,1 +1,2 @@
 # firebaselogin
+Signup fuction add
